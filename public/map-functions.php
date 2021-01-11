@@ -1,4 +1,8 @@
 <script>
+<?php
+include '../map-icons-master/dist/js/map-icons.js';
+?>
+
 // GOOGLE MAPS SEARCH BOX
 
 function myMap() {
@@ -17,7 +21,6 @@ function myMap() {
   map.addListener('bounds_changed', () => {
     searchBox.setBounds(map.getBounds())
   })
-  let markers = []
   // Listen for the event fired when the user selects a prediction and retrieve
   // more details for that place.
   searchBox.addListener('places_changed', () => {
@@ -26,11 +29,6 @@ function myMap() {
     if (places.length == 0) {
       return
     }
-    // Clear out the old markers.
-    markers.forEach((marker) => {
-      marker.setMap(null)
-    })
-    markers = []
     // For each place, get the icon, name and location.
     const bounds = new google.maps.LatLngBounds()
     places.forEach((place) => {
@@ -56,52 +54,52 @@ function myMap() {
   })
 
   
-lat = [];
-  <?php foreach ($office_specs as $key => $office_specs) { ?>
-    lat = "<?=($office_specs['lat'])?>";
-    lng = "<?=($office_specs['lng'])?>";
-    <?php } ?> 
+  
 
-    console.log(typeof parseFloat(lat))
 
-    markers = [
-      {
+    var markers = [
+      <?php foreach ($office_specs as $key => $office_spec) { ?>
+        lat = "<?=($office_spec['lat'])?>",
+      lng = "<?=($office_spec['lng'])?>",
+        {
         coords:{lat:parseFloat(lat),lng:parseFloat(lng)},
-        iconImage:'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
-        content:'<h4>Norrsken</h4>'
+        content:'<?=($office_spec['conf_kvm'])?>'
       },
-      {
-        coords:{lat:42.8584,lng:-70.9300},
-        content:'<h1>Amesbury MA</h1>'
-      },
-      {
-        coords:{lat:42.7762,lng:-71.0773}
-      }
+      <?php } ?>
     ];
 
     for(var i = 0;i < markers.length;i++){
       // Add marker
       addMarker(markers[i]);
     }
-
+    // var marker = new google.maps.Marker({
+      // position:new google.maps.LatLng(props.coords),
     // Add Marker Function
     function addMarker(props){
-      var marker = new google.maps.Marker({
-        position:props.coords,
+      var marker = new mapIcons.Marker({
+        position:new google.maps.LatLng(props.coords),
         map:map,
-        //icon:props.iconImage
+        icon: {
+            path: mapIcons.shapes.MAP_PIN,
+            fillColor: '#f29a01',
+            fillOpacity: 1,
+            strokeColor: '',
+            strokeWeight: 0
+          },
+          map_icon_label: '<span class="map-icon map-icon-political"></span>'
       });
 
       // Check for customicon
-      if(props.iconImage){
-        // Set icon image
-        marker.setIcon(props.iconImage);
-      }
+      // if(props.icon){
+      //   // Set icon 
+      //   marker.setIcon(props.icon);
+      // }
 
       // Check content
       if(props.content){
         var infoWindow = new google.maps.InfoWindow({
-          content:props.content
+          content:props.content,
+          
         });
 
         marker.addListener('click', function(){

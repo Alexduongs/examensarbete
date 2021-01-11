@@ -1,19 +1,28 @@
 <?php
 require '../src/dbconnect.php';
+include '../src/config.php';
 
 try {
-  $query = "SELECT * FROM offices";
-  $stmt = $conn->query($query);
-  $offices = $stmt->fetchall();
-  }   catch (\PDOException $e) {
+
+  $query = "SELECT * FROM offices WHERE id = :id;";
+
+  $stmt = $conn->prepare($query);
+  $stmt->bindValue(':id', $_GET['id']);
+  $stmt->execute();
+  $offices = $stmt->fetch();
+}   catch (\PDOException $e) {
   throw new \PDOException($e->getMessage(), (int) $e->getCode());
   }
   
   try {
-    $query = "SELECT * FROM office_specs";
-    $stmt = $conn->query($query);
-    $office_specs = $stmt->fetchall();
-    }   catch (\PDOException $e) {
+
+    $query = "SELECT * FROM office_specs WHERE office_id = :id;";
+  
+    $stmt = $conn->prepare($query);
+    $stmt->bindValue(':id', $_GET['id']);
+    $stmt->execute();
+    $office_specs = $stmt->fetch();
+  }   catch (\PDOException $e) {
     throw new \PDOException($e->getMessage(), (int) $e->getCode());
     }
 
@@ -31,27 +40,29 @@ try {
 </head>
 <body>
 
-<?php foreach ($offices as $key => $office) {foreach ($office_specs as $key => $officespecs) ?>
-  <img class="img-fluid" src="<?=htmlentities($office['office_img'])?>" alt="">
+<?php foreach ($offices as $key => $office) { ?>
+  <img class="img-fluid" src="<?=($offices['office_img'])?>" alt=""></img>
   <div class="p-4">
-    <h2 class="text-center"><?=htmlentities($office['office_name'])?></h2>
-    <p class="street text-center"><?=htmlentities($office['street'])?>, <?=htmlentities($office['postal_code'])?></p>
-    <p class=""><?=htmlentities($office['description'])?></p>
+    <h2 class="text-center"><?=($offices['office_name'])?></h2>
+    <p class="street text-center"><?=($offices['street'])?>, <?=($offices['postal_code'])?></p>
+    <p class=""><?=($offices['description'])?></p>
   <hr class="m-4">
+</div>
+  <?php break; } ?>
+
+  <?php foreach ($office_specs as $key => $officespecs) { ?>
   <h4 class="text-center">Bekvämligheter</h4>
-  <br>
-    <p class="">Storlek: <?=htmlentities($officespecs['conf_kvm'])?></p>
-    <p class=""><?=htmlentities($officespecs['conf_wifi'])?></p>
-    <p class=""><?=htmlentities($officespecs['conf_coffe'])?></p>
-    <p class="">Rumstyp: <?=htmlentities($officespecs['room_type'])?></p><br>
-    <p class="">Platser lediga: <?=htmlentities($officespecs['room_qty'])?></p>
+  <br><div class="p-4">
+    <p class="">Storlek: <?=htmlentities($office_specs['conf_kvm'])?></p>
+    <p class=""><?=htmlentities($office_specs['conf_wifi'])?></p>
+    <p class=""><?=htmlentities($office_specs['conf_coffe'])?></p>
+    <p class="">Rumstyp: <?=htmlentities($office_specs['room_type'])?></p><br>
+    <p class="">Platser lediga: <?=htmlentities($office_specs['room_qty'])?></p>
     <a id="cardnav" href="#" class="btn btn-primary">Boka</a>
     </div>
-  <?php } ?>
-  
-
-
 </body>
+</html>
+<?php break; } ?>
 
 <?php
 include '../layout/bottomnav.php';

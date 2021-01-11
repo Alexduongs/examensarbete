@@ -5,6 +5,8 @@
 
 require('dbconnect.php');
 
+session_start();
+
 // Turn on/off error reporting
 // ini_set("error_reporting", E_ALL);
 // error_reporting(E_ALL);

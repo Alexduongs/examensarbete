@@ -29,3 +29,7 @@ h5 {
 body {
   padding-bottom: 65px;
 }
+
+.card-title {
+  text-decoration: none !important;
+}
